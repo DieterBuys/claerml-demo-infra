@@ -44,15 +44,17 @@ jobs:
         run: terraform plan
         working-directory: ec2-infra
 
-      - name: Apply or Destroy Terraform
+      - name: Apply Terraform
         if: github.event.inputs.action == 'apply'
+        id: apply
         run: |
           terraform apply -auto-approve
-          echo "::set-output name=elastic_ip::$(terraform output -raw elastic_ip)"
+          echo "elastic_ip=$(terraform output -raw elastic_ip)" >> $GITHUB_OUTPUT
         working-directory: ec2-infra
 
       - name: Destroy Terraform
         if: github.event.inputs.action == 'destroy'
+        id: destroy
         run: terraform destroy -auto-approve
         working-directory: ec2-infra
 
@@ -60,7 +62,7 @@ jobs:
         if: github.event.inputs.action == 'apply'
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.CLEARML_DEMO_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           eval $(ssh-agent -s)
           ssh-add ~/.ssh/id_rsa
@@ -69,4 +71,3 @@ jobs:
         if: github.event.inputs.action == 'apply'
         run: |
           ssh -o StrictHostKeyChecking=no ec2-user@${{ steps.apply.outputs.elastic_ip }} 'echo "SSH connection successful"'
-
