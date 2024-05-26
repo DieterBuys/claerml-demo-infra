@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-west-2" # Change this to your preferred region
+  region = "us-west-2"
 }
 
 # Create a VPC
@@ -14,7 +14,7 @@ resource "aws_vpc" "main_vpc" {
 resource "aws_subnet" "main_subnet" {
   vpc_id            = aws_vpc.main_vpc.id
   cidr_block        = "10.0.1.0/24"
-  availability_zone = "us-west-2"
+  availability_zone = "us-west-2a"
   tags = {
     Name = "main_subnet"
   }
@@ -80,15 +80,15 @@ resource "aws_instance" "main_instance" {
   security_groups = [aws_security_group.main_sg.name]
 
   tags = {
-    Name = "clearml_server_instance"
+    Name = "main_instance"
   }
 }
 
 # Allocate an Elastic IP
-resource "aws_eip" "clearml_server_eip" {
+resource "aws_eip" "main_eip" {
   instance = aws_instance.main_instance.id
   domain   = "vpc"
   tags = {
-    Name = "clearml_server_eip"
+    Name = "main_eip"
   }
 }

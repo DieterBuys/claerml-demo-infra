@@ -1,9 +1,16 @@
 name: Deploy Terraform
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Choose action: apply or destroy'
+        required: true
+        default: 'apply'
+        type: choice
+        options:
+          - apply
+          - destroy
 
 jobs:
   terraform:
@@ -37,7 +44,12 @@ jobs:
         run: terraform plan
         working-directory: ec2-infra
 
-#      - name: Apply Terraform
-#        if: github.ref == 'refs/heads/main'
-#        run: terraform apply -auto-approve
-#        working-directory: ec2-infra
+      - name: Apply or Destroy Terraform
+        if: github.event.inputs.action == 'apply'
+        run: terraform apply -auto-approve
+        working-directory: ec2-infra
+
+      - name: Destroy Terraform
+        if: github.event.inputs.action == 'destroy'
+        run: terraform destroy -auto-approve
+        working-directory: ec2-infra
