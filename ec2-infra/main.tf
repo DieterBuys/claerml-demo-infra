@@ -136,3 +136,8 @@ resource "aws_eip" "main_eip" {
     Name = "main_eip"
   }
 }
+
+# Output the Elastic IP address
+output "elastic_ip" {
+  value = aws_eip.main_eip.public_ip
+}
