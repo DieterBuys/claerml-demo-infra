@@ -18,55 +18,55 @@ resource "aws_key_pair" "clearml_demo_key" {
 }
 
 # Create a VPC
-resource "aws_vpc" "main_vpc" {
+resource "aws_vpc" "clearml_demo_vpc" {
   cidr_block = "10.0.0.0/16"
   tags = {
-    Name = "main_vpc"
+    Name = "clearml_demo_vpc"
   }
 }
 
 # Create a subnet
-resource "aws_subnet" "main_subnet" {
-  vpc_id            = aws_vpc.main_vpc.id
+resource "aws_subnet" "clearml_demo_subnet" {
+  vpc_id            = aws_vpc.clearml_demo_vpc.id
   cidr_block        = "10.0.1.0/24"
   availability_zone = "us-west-2a"
   tags = {
-    Name = "main_subnet"
+    Name = "clearml_demo_subnet"
   }
 }
 
 # Create an internet gateway
-resource "aws_internet_gateway" "main_igw" {
-  vpc_id = aws_vpc.main_vpc.id
+resource "aws_internet_gateway" "clearml_demo_igw" {
+  vpc_id = aws_vpc.clearml_demo_vpc.id
   tags = {
-    Name = "main_igw"
+    Name = "clearml_demo_igw"
   }
 }
 
 # Create a route table
-resource "aws_route_table" "main_route_table" {
-  vpc_id = aws_vpc.main_vpc.id
+resource "aws_route_table" "clearml_demo_route_table" {
+  vpc_id = aws_vpc.clearml_demo_vpc.id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.main_igw.id
+    gateway_id = aws_internet_gateway.clearml_demo_igw.id
   }
 
   tags = {
-    Name = "main_route_table"
+    Name = "clearml_demo_route_table"
   }
 }
 
 # Associate the route table with the subnet
-resource "aws_route_table_association" "main_route_table_association" {
-  subnet_id      = aws_subnet.main_subnet.id
-  route_table_id = aws_route_table.main_route_table.id
+resource "aws_route_table_association" "clearml_demo_route_table_association" {
+  subnet_id      = aws_subnet.clearml_demo_subnet.id
+  route_table_id = aws_route_table.clearml_demo_route_table.id
 }
 
 # Create a security group
-resource "aws_security_group" "main_sg" {
-  vpc_id = aws_vpc.main_vpc.id
-  name   = "main_sg"
+resource "aws_security_group" "clearml_demo_sg" {
+  vpc_id = aws_vpc.clearml_demo_vpc.id
+  name   = "clearml_demo_sg"
 
   ingress {
     from_port   = 22
@@ -104,7 +104,7 @@ resource "aws_security_group" "main_sg" {
   }
 
   tags = {
-    Name = "main_sg"
+    Name = "clearml_demo_sg"
   }
 }
 
@@ -112,8 +112,8 @@ resource "aws_security_group" "main_sg" {
 resource "aws_instance" "clearml_server" {
   ami                    = "ami-0327adc54a82c8d1d"
   instance_type          = "t3.xlarge"
-  subnet_id              = aws_subnet.main_subnet.id
-  vpc_security_group_ids = [aws_security_group.main_sg.id]
+  subnet_id              = aws_subnet.clearml_demo_subnet.id
+  vpc_security_group_ids = [aws_security_group.clearml_demo_sg.id]
   key_name               = aws_key_pair.clearml_demo_key.key_name
 
 
@@ -129,15 +129,15 @@ resource "aws_instance" "clearml_server" {
 }
 
 # Allocate an Elastic IP
-resource "aws_eip" "main_eip" {
+resource "aws_eip" "clearml_demo_eip" {
   instance = aws_instance.clearml_server.id
   domain   = "vpc"
   tags = {
-    Name = "main_eip"
+    Name = "clearml_demo_eip"
   }
 }
 
 # Output the Elastic IP address
 output "elastic_ip" {
-  value = aws_eip.main_eip.public_ip
+  value = aws_eip.clearml_demo_eip.public_ip
 }
