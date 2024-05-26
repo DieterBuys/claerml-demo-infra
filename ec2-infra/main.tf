@@ -1,3 +1,7 @@
+provider "aws" {
+  region = "us-west-2"
+}
+
 terraform {
   backend "s3" {
     bucket         = "clearml-demo-tfstate"
@@ -7,8 +11,10 @@ terraform {
   }
 }
 
-provider "aws" {
-  region = "us-west-2"
+# SSH Key
+resource "aws_key_pair" "clearml_demo_key" {
+  key_name   = "clearml-demo-key"
+  public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINDrjaVFLkwXak/HQK+cMVvcM0nIK55dny1P7iCT9S7H"
 }
 
 # Create a VPC
@@ -87,6 +93,8 @@ resource "aws_instance" "clearml_server" {
   instance_type          = "t3.xlarge"
   subnet_id              = aws_subnet.main_subnet.id
   vpc_security_group_ids = [aws_security_group.main_sg.id]
+  key_name               = aws_key_pair.clearml_demo_key.key_name
+
 
   root_block_device {
     volume_size = 32

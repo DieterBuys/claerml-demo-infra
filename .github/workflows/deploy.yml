@@ -53,3 +53,18 @@ jobs:
         if: github.event.inputs.action == 'destroy'
         run: terraform destroy -auto-approve
         working-directory: ec2-infra
+
+      - name: Add SSH key to SSH agent
+        if: github.event.inputs.action == 'apply'
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.CLEARML_DEMO_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          eval $(ssh-agent -s)
+          ssh-add ~/.ssh/id_rsa
+
+      - name: Test SSH access to EC2 instance
+        if: github.event.inputs.action == 'apply'
+        run: |
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ steps.apply.outputs.elastic_ip }} 'echo "SSH connection successful"'
+
