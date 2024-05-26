@@ -87,7 +87,7 @@ resource "aws_instance" "main_instance" {
 # Allocate an Elastic IP
 resource "aws_eip" "clearml_server_eip" {
   instance = aws_instance.main_instance.id
-  vpc      = true
+  domain   = "vpc"
   tags = {
     Name = "clearml_server_eip"
   }
