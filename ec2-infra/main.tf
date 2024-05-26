@@ -1,3 +1,12 @@
+terraform {
+  backend "s3" {
+    bucket         = "clearml-demo-tfstate"
+    key            = "ec2-infra/terraform.tfstate"
+    region         = "us-west-2"
+    dynamodb_table = "terraform-locks"
+  }
+}
+
 provider "aws" {
   region = "us-west-2"
 }
@@ -78,6 +87,12 @@ resource "aws_instance" "clearml_server" {
   instance_type          = "t3.xlarge"
   subnet_id              = aws_subnet.main_subnet.id
   vpc_security_group_ids = [aws_security_group.main_sg.id]
+
+  root_block_device {
+    volume_size = 32
+    volume_type = "gp2"  # General Purpose SSD
+  }
+
 
   tags = {
     Name = "clearml_server"
