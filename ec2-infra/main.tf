@@ -73,20 +73,20 @@ resource "aws_security_group" "main_sg" {
 }
 
 # Create an EC2 instance
-resource "aws_instance" "main_instance" {
-  ami             = "ami-0327adc54a82c8d1d"
-  instance_type   = "t3.xlarge"
-  subnet_id       = aws_subnet.main_subnet.id
-  security_groups = [aws_security_group.main_sg.name]
+resource "aws_instance" "clearml_server" {
+  ami                    = "ami-0327adc54a82c8d1d"
+  instance_type          = "t3.xlarge"
+  subnet_id              = aws_subnet.main_subnet.id
+  vpc_security_group_ids = [aws_security_group.main_sg.id]
 
   tags = {
-    Name = "main_instance"
+    Name = "clearml_server"
   }
 }
 
 # Allocate an Elastic IP
 resource "aws_eip" "main_eip" {
-  instance = aws_instance.main_instance.id
+  instance = aws_instance.clearml_server.id
   domain   = "vpc"
   tags = {
     Name = "main_eip"
