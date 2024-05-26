@@ -46,7 +46,9 @@ jobs:
 
       - name: Apply or Destroy Terraform
         if: github.event.inputs.action == 'apply'
-        run: terraform apply -auto-approve
+        run: |
+          terraform apply -auto-approve
+          echo "::set-output name=elastic_ip::$(terraform output -raw elastic_ip)"
         working-directory: ec2-infra
 
       - name: Destroy Terraform
