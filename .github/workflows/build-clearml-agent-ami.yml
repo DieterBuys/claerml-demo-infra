@@ -20,6 +20,14 @@ jobs:
         with:
           version: latest
 
+      - name: Initialize Packer
+        run: packer init packer.json
+        working-directory: clearml-agent-ami
+
+      - name: Upgrade to HCL2
+        run: packer hcl2_upgrade packer.json
+        working-directory: clearml-agent-ami
+
       - name: Validate Packer template
         run: packer validate packer.json
         working-directory: clearml-agent-ami
