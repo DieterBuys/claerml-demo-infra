@@ -116,28 +116,22 @@ resource "aws_instance" "clearml_server" {
   vpc_security_group_ids = [aws_security_group.clearml_demo_sg.id]
   key_name               = aws_key_pair.clearml_demo_key.key_name
 
-
   root_block_device {
     volume_size = 32
     volume_type = "gp2"  # General Purpose SSD
   }
 
-
   tags = {
     Name = "clearml_server"
   }
 }
-
 # Allocate an Elastic IP
-resource "aws_eip" "clearml_demo_eip" {
-  instance = aws_instance.clearml_server.id
-  domain   = "vpc"
-  tags = {
-    Name = "clearml_demo_eip"
-  }
+resource "aws_eip" "clearml_server_eip" {
+  vpc = true
 }
 
-# Output the Elastic IP address
-output "elastic_ip" {
-  value = aws_eip.clearml_demo_eip.public_ip
+# Associate the Elastic IP with the EC2 instance
+resource "aws_eip_association" "clearml_server_eip_assoc" {
+  instance_id   = aws_instance.clearml_server.id
+  allocation_id = aws_eip.clearml_server_eip.id
 }

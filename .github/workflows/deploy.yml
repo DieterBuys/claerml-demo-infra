@@ -34,15 +34,15 @@ jobs:
 
       - name: Initialize Terraform
         run: terraform init
-        working-directory: ec2-infra
+        working-directory: infra
 
       - name: Validate Terraform
         run: terraform validate
-        working-directory: ec2-infra
+        working-directory: infra
 
       - name: Plan Terraform
         run: terraform plan
-        working-directory: ec2-infra
+        working-directory: infra
 
       - name: Apply Terraform
         if: github.event.inputs.action == 'apply'
@@ -50,13 +50,13 @@ jobs:
         run: |
           terraform apply -auto-approve
           echo "elastic_ip=$(terraform output -raw elastic_ip)" >> $GITHUB_OUTPUT
-        working-directory: ec2-infra
+        working-directory: infra
 
       - name: Destroy Terraform
         if: github.event.inputs.action == 'destroy'
         id: destroy
         run: terraform destroy -auto-approve
-        working-directory: ec2-infra
+        working-directory: infra
 
       - name: Add SSH key to SSH agent
         if: github.event.inputs.action == 'apply'
