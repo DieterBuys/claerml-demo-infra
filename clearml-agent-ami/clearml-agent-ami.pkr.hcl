@@ -9,6 +9,7 @@ packer {
 
 locals {
   timestamp = regex_replace(timestamp(), "[- TZ:]", "")
+  unix_timestamp = formatdate("epoch", timestamp())
 }
 
 variable "aws_access_key" {
@@ -53,7 +54,7 @@ source "amazon-ebs" "clearml_ami" {
   source_ami                  = var.source_ami
   instance_type               = var.instance_type
   ssh_username                = var.ssh_username
-  ami_name                    = "${var.ami_name}-${timestamp()}"
+  ami_name                    = "${var.ami_name}-${local.unix_timestamp}"
   associate_public_ip_address = true
 }
 
