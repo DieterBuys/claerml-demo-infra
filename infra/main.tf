@@ -125,9 +125,9 @@ resource "aws_instance" "clearml_server" {
     Name = "clearml_server"
   }
 }
-# Allocate an Elastic IP
+
 resource "aws_eip" "clearml_server_eip" {
-  vpc = true
+  domain = "vpc"
 }
 
 resource "aws_eip_association" "clearml_server_eip_assoc" {

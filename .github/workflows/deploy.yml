@@ -70,4 +70,4 @@ jobs:
       - name: Test SSH access to EC2 instance
         if: github.event.inputs.action == 'apply'
         run: |
-          ssh -o StrictHostKeyChecking=no ec2-user@${{ steps.apply.outputs.elastic_ip }} 'echo "SSH connection successful"'
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ steps.apply.outputs.clearml_server_ip }} 'echo "SSH connection successful"'
