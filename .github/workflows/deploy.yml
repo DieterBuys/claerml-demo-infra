@@ -53,7 +53,7 @@ jobs:
         id: apply
         run: |
           terraform apply -auto-approve
-          echo "elastic_ip=$(terraform output -raw clearml_server_ip)" >> $GITHUB_OUTPUT
+          echo "clearml_server_ip=$(terraform output -raw clearml_server_ip)" >> $GITHUB_OUTPUT
         working-directory: infra
 
       - name: Destroy Terraform
