@@ -1,7 +1,9 @@
-output "clearml_server_ip" {
-  value = aws_eip.clearml_server_eip.public_ip
+# Output the Spot Fleet Request ID
+output "spot_fleet_request_id" {
+  value = aws_spot_fleet_request.spot_fleet.id
 }
 
-output "ecs_cluster_name" {
-  value = aws_ecs_cluster.clearml_cluster.name
+# Output the Elastic IP address
+output "clearml_server_ip" {
+  value = aws_eip.clearml_server_eip.public_ip
 }

@@ -137,14 +137,9 @@ resource "aws_eip_association" "clearml_server_eip_assoc" {
   allocation_id = aws_eip.clearml_server_eip.id
 }
 
-# ECS Cluster
-resource "aws_ecs_cluster" "clearml_cluster" {
-  name = "clearml-cluster"
-}
-
-# IAM Role for ECS Spot Instances
-resource "aws_iam_role" "ecs_instance_role" {
-  name = "ecs_instance_role"
+# IAM Role for Spot Instances
+resource "aws_iam_role" "spot_instance_role" {
+  name = "spot_instance_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -160,14 +155,20 @@ resource "aws_iam_role" "ecs_instance_role" {
   })
 }
 
-# Attach the AmazonEC2ContainerServiceforEC2Role policy to the role
-resource "aws_iam_role_policy_attachment" "ecs_instance_role_policy" {
-  role       = aws_iam_role.ecs_instance_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+# Attach the AmazonEC2RoleforSSM policy to the role
+resource "aws_iam_role_policy_attachment" "spot_instance_role_policy" {
+  role       = aws_iam_role.spot_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+}
+
+# IAM Instance Profile for Spot Instances
+resource "aws_iam_instance_profile" "spot_instance_profile" {
+  name = "spot_instance_profile"
+  role = aws_iam_role.spot_instance_role.name
 }
 
 # Spot Fleet Request
-resource "aws_spot_fleet_request" "ecs_spot_fleet" {
+resource "aws_spot_fleet_request" "spot_fleet" {
   iam_fleet_role                      = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-ec2-spot-fleet-tagging-role"
   allocation_strategy                 = "lowestPrice"
   target_capacity                     = 1
@@ -176,23 +177,17 @@ resource "aws_spot_fleet_request" "ecs_spot_fleet" {
   spot_price                          = "0.50"
 
   launch_specification {
-    instance_type     = "g3s.xlarge"
-    ami               = "ami-027492973b111510a" # amzn2-ami-ecs-gpu-hvm-2.0.20240515-x86_64-ebs
-    key_name          = aws_key_pair.clearml_demo_key.key_name
-    subnet_id         = aws_subnet.clearml_demo_subnet.id
-    vpc_security_group_ids = [aws_security_group.clearml_demo_sg.id]
-    iam_instance_profile = {
-      arn = aws_iam_instance_profile.ecs_instance_profile.arn
+    instance_type           = "g3s.xlarge"
+    ami                     = "ami-027492973b111510a"
+    key_name                = aws_key_pair.clearml_demo_key.key_name
+    subnet_id               = aws_subnet.clearml_demo_subnet.id
+    vpc_security_group_ids  = [aws_security_group.clearml_demo_sg.id]
+    iam_instance_profile {
+      arn = aws_iam_instance_profile.spot_instance_profile.arn
     }
-
     root_block_device {
       volume_size = 32
       volume_type = "gp2"
     }
   }
-}
-
-resource "aws_iam_instance_profile" "ecs_instance_profile" {
-  name = "clearml_demo_ecs_instance_profile"
-  role = aws_iam_role.ecs_instance_role.name
 }
