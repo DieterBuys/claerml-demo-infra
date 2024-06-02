@@ -15,6 +15,10 @@ on:
     paths:
       - 'infra/**'
       - '.github/workflows/deploy-terraform.yml'
+    inputs:
+      action:
+        type: string
+        default: 'apply'
 
 jobs:
   terraform:
@@ -49,7 +53,7 @@ jobs:
         working-directory: infra
 
       - name: Apply Terraform
-        if: github.event.inputs.action == 'apply'
+        if: github.event_name == 'push' || github.event.inputs.action == 'apply'
         id: apply
         run: |
           terraform apply -auto-approve
@@ -63,7 +67,7 @@ jobs:
         working-directory: infra
 
       - name: Add SSH key to SSH agent
-        if: github.event.inputs.action == 'apply'
+        if: github.event_name == 'push' || github.event.inputs.action == 'apply'
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.CLEARML_DEMO_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
@@ -72,6 +76,6 @@ jobs:
           ssh-add ~/.ssh/id_rsa
 
       - name: Test SSH access to EC2 instance
-        if: github.event.inputs.action == 'apply'
+        if: github.event_name == 'push' || github.event.inputs.action == 'apply'
         run: |
           ssh -o StrictHostKeyChecking=no ec2-user@${{ steps.apply.outputs.clearml_server_ip }} 'echo "SSH connection successful"'
