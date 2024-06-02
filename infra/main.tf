@@ -169,7 +169,7 @@ resource "aws_iam_instance_profile" "spot_instance_profile" {
 
 # Spot Fleet Request
 resource "aws_spot_fleet_request" "spot_fleet" {
-  iam_fleet_role                      = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-ec2-spot-fleet-tagging-role"
+  iam_fleet_role                      = "arn:aws:iam::${var.account_id}:role/aws-ec2-spot-fleet-tagging-role"
   allocation_strategy                 = "lowestPrice"
   target_capacity                     = 1
   terminate_instances_with_expiration = true
@@ -182,9 +182,8 @@ resource "aws_spot_fleet_request" "spot_fleet" {
     key_name                = aws_key_pair.clearml_demo_key.key_name
     subnet_id               = aws_subnet.clearml_demo_subnet.id
     vpc_security_group_ids  = [aws_security_group.clearml_demo_sg.id]
-    iam_instance_profile {
-      arn = aws_iam_instance_profile.spot_instance_profile.arn
-    }
+    iam_instance_profile_arn = aws_iam_instance_profile.spot_instance_profile.arn
+
     root_block_device {
       volume_size = 32
       volume_type = "gp2"
