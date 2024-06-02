@@ -21,15 +21,11 @@ jobs:
           version: latest
 
       - name: Initialize Packer
-        run: packer init packer.json
-        working-directory: clearml-agent-ami
-
-      - name: Upgrade to HCL2
-        run: packer hcl2_upgrade packer.json
+        run: packer init clearml-agent-ami.pkr.hcl
         working-directory: clearml-agent-ami
 
       - name: Validate Packer template
-        run: packer validate packer.json
+        run: packer validate clearml-agent-ami.pkr.hcl
         working-directory: clearml-agent-ami
 
       - name: Build AMI with Packer
@@ -40,5 +36,5 @@ jobs:
           packer build \
             -var 'aws_access_key=${{ secrets.AWS_ACCESS_KEY_ID }}' \
             -var 'aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}' \
-            packer.json
+            clearml-agent-ami.pkr.hcl
         working-directory: clearml-agent-ami
