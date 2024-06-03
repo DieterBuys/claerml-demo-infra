@@ -4,3 +4,5 @@
 **/.venv
 
 vision-model/pothole_dataset**
+vision-model/runs
+vision-model/yolov8*.pt
