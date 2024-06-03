@@ -2,3 +2,5 @@
 .terraform
 
 **/.venv
+
+vision-model/pothole_dataset**

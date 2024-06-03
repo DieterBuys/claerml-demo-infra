@@ -39,22 +39,26 @@ def superimpose_images(background, foreground):
             (alpha_fg * foreground[:, :, c] + alpha_bg * background[y_offset:y_offset+fg_h, x_offset:x_offset+fg_w, c])
     return background
 
-# Load images
-background_images = load_images_from_folder('input/bg')
-foreground_images = load_images_from_folder('input/fg')
+def main():
+    # Load images
+    background_images = load_images_from_folder('input/bg')
+    foreground_images = load_images_from_folder('input/fg')
 
-# Generate synthetic images
-synthetic_images = []
-for bg in background_images:
-    for fg in foreground_images:
-        fg_scaled = random_scaling(fg)
-        fg_rotated = random_rotation(fg_scaled)
-        fg_rgba = cv2.cvtColor(fg_rotated, cv2.COLOR_BGR2BGRA)
-        synthetic_image = superimpose_images(bg.copy(), fg_rgba)
-        synthetic_images.append(synthetic_image)
+    # Generate synthetic images
+    synthetic_images = []
+    for bg in background_images:
+        for fg in foreground_images:
+            fg_scaled = random_scaling(fg)
+            fg_rotated = random_rotation(fg_scaled)
+            fg_rgba = cv2.cvtColor(fg_rotated, cv2.COLOR_BGR2BGRA)
+            synthetic_image = superimpose_images(bg.copy(), fg_rgba)
+            synthetic_images.append(synthetic_image)
 
-# Save synthetic images
-output_folder = 'path/to/output'
-os.makedirs(output_folder, exist_ok=True)
-for i, img in enumerate(synthetic_images):
-    cv2.imwrite(os.path.join(output_folder, f'synthetic_{i}.png'), img)
+    # Save synthetic images
+    output_folder = 'output'
+    os.makedirs(output_folder, exist_ok=True)
+    for i, img in enumerate(synthetic_images):
+        cv2.imwrite(os.path.join(output_folder, f'synthetic_{i}.png'), img)
+
+if __name__ == '__main__':
+    main()
