@@ -171,7 +171,7 @@ resource "aws_iam_instance_profile" "spot_instance_profile" {
 resource "aws_spot_fleet_request" "spot_fleet" {
   iam_fleet_role                      = "arn:aws:iam::${var.account_id}:role/aws-ec2-spot-fleet-tagging-role"
   allocation_strategy                 = "lowestPrice"
-  target_capacity                     = 1
+  target_capacity                     = 0
   terminate_instances_with_expiration = true
   valid_until                         = "2025-01-01T00:00:00Z"
   spot_price                          = "0.50"
